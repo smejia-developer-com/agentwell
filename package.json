@@ -1,0 +1,41 @@
+{
+  "name": "agentwell",
+  "version": "1.0.0",
+  "description": "Claude Code hook that celebrates AI task completions with sound + wellness reminders to prevent developer burnout",
+  "keywords": [
+    "claude-code",
+    "claude-code-hook",
+    "anthropic",
+    "hook",
+    "wellness",
+    "burnout",
+    "developer-health",
+    "productivity",
+    "ai",
+    "notification"
+  ],
+  "homepage": "https://github.com/smejia-developer-com/agentwell#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/smejia-developer-com/agentwell.git"
+  },
+  "bugs": {
+    "url": "https://github.com/smejia-developer-com/agentwell/issues"
+  },
+  "license": "MIT",
+  "author": "Sergio Mejia Silva",
+  "bin": {
+    "agentwell": "bin/cli.js"
+  },
+  "scripts": {
+    "test": "node bin/run.js --test"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "files": [
+    "bin/",
+    "README.md",
+    "LICENSE"
+  ]
+}
