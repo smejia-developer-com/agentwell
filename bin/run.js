@@ -127,13 +127,39 @@ with wave.open(tmp, 'w') as wf:
 
   try {
     if (platform === 'darwin') {
-      const audioPhrases = [
-        'Mission completed.',
-        'Well done!',
-        'Woohoo!',
-        'Great, take a deep breath.'
-      ];
-      const randomPhrase = pick(audioPhrases);
+      // Track task count
+      const countFile = path.join(os.homedir(), '.claude', 'agentwell.count');
+      let tasksCompleted = 1;
+      try {
+        if (fs.existsSync(countFile)) {
+          tasksCompleted = parseInt(fs.readFileSync(countFile, 'utf8'), 10) + 1;
+        }
+        // Save new count (or create directory if missing)
+        fs.mkdirSync(path.dirname(countFile), { recursive: true });
+        fs.writeFileSync(countFile, tasksCompleted.toString(), 'utf8');
+      } catch (_) { }
+
+      let randomPhrase = '';
+      if (tasksCompleted % 5 === 0) {
+        // Every 5th task, say a wellness phrase
+        const wellnessPhrases = [
+          'Great job. Take a deep breath.',
+          'Stretch for a moment.',
+          'Time to hydrate. Drink some water.',
+          'Look away from the screen for 20 seconds.'
+        ];
+        randomPhrase = pick(wellnessPhrases);
+      } else {
+        // Regular phrases for other tasks
+        const audioPhrases = [
+          'Mission completed.',
+          'Well done!',
+          'Woohoo!',
+          'Nice progress.'
+        ];
+        randomPhrase = pick(audioPhrases);
+      }
+
       // Use macOS `say` for a spoken celebration
       spawn('say', ['-v', 'Samantha', '-r', '160', randomPhrase], { detached: true, stdio: 'ignore' }).unref();
 
