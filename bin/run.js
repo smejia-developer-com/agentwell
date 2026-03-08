@@ -163,7 +163,7 @@ with wave.open(tmp, 'w') as wf:
       }
 
       // Use macOS `say` for a spoken celebration
-      spawn('say', ['-v', 'Samantha', '-r', '160', randomPhrase], { detached: true, stdio: 'ignore' }).unref();
+      spawn('say', ['-v', 'Daniel', '-r', '160', randomPhrase], { detached: true, stdio: 'ignore' }).unref();
 
     } else if (platform === 'linux' && hasPython()) {
       const player = hasCmd('paplay') ? 'paplay' : hasCmd('aplay') ? 'aplay -q' : null;
