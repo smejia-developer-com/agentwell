@@ -168,7 +168,10 @@ function status() {
 }
 
 // ── Run (manual test) ────────────────────────────────────────
-function run() {
+function run(cmdName) {
+  if (cmdName && !process.argv.includes(cmdName)) {
+    process.argv.push(cmdName);
+  }
   require('./run.js');
 }
 
@@ -179,8 +182,8 @@ switch (cmd) {
   case 'install': install(); break;
   case 'uninstall': uninstall(); break;
   case 'status': status(); break;
-  case 'run': run(); break;
-  case 'relax': run(); break;
+  case 'run': run(cmd); break;
+  case 'relax': run(cmd); break;
   case 'help':
   case '--help':
   case '-h':
