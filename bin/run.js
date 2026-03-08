@@ -144,8 +144,21 @@ with wave.open(tmp, 'w') as wf:
           fs.writeFileSync(countFile, tasksCompleted.toString(), 'utf8');
         } catch (_) { }
 
-        if (tasksCompleted % 5 === 0) {
-          // Every 5th task, say a wellness phrase
+        // Allow configuring the milestone via package.json in the current working directory
+        let milestone = 5;
+        try {
+          const userPkgPath = path.join(process.cwd(), 'package.json');
+          if (fs.existsSync(userPkgPath)) {
+            const userPkg = JSON.parse(fs.readFileSync(userPkgPath, 'utf8'));
+            if (userPkg && userPkg.agentwell && userPkg.agentwell.wellnessMilestone) {
+              const val = parseInt(userPkg.agentwell.wellnessMilestone, 10);
+              if (!isNaN(val) && val > 0) milestone = val;
+            }
+          }
+        } catch (_) { }
+
+        if (tasksCompleted % milestone === 0) {
+          // Every Nth task, say a wellness phrase
           const wellnessPhrases = [
             'Great job. Take a deep breath.',
             'Stretch for a moment.',

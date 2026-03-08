@@ -17,8 +17,8 @@ Every time a Claude Code agent finishes a task, **agentwell** fires automaticall
 
 | | Feature | Description |
 |---|---|---|
-| 🎵 | **Celebration sound** | Uses macOS `say` for spoken messages ("We did it", "Mission completed"). Fallback: synthesized melody |
-| 🎈 | **Milestone reminders** | Every 5th task triggers a specific wellness message (e.g. "Take a deep breath", "Stretch for a moment") |
+| 🎵 | **Celebration sound** | Uses macOS `say` for spoken messages ("Well done", "Mission completed"). Fallback: synthesized melody |
+| 🎈 | **Milestone reminders** | Every 5th task triggers a specific wellness message (e.g. "Great, now take a deep breath", "Stretch for a moment") |
 | 🎉 | **Motivational message** | Rotates through 15 unique congratulatory phrases |
 | 💡 | **Wellness tip** | Rotates through 17 tips: breathing, movement, hydration, burnout prevention |
 | 🤖 | **Smart detection** | Different label for main agent `Stop` vs. `SubagentStop` |
@@ -99,7 +99,7 @@ The hook is registered in `~/.claude/settings.json` automatically by `agentwell 
 agentwell uses native voice synthesis on macOS (`say` command) to randomly announce one of several victory phrases (e.g., "Mission completed", "Well done!"). 
 
 **🧘‍♂️ Wellness Milestones**
-To keep you mindful during deep work, **every 5 tasks** the standard victory phrase is replaced with a spoken wellness reminder, such as:
+To keep you mindful during deep work, **every 5 tasks** (by default) the standard victory phrase is replaced with a spoken wellness reminder, such as:
 - *"Great job. Take a deep breath."*
 - *"Stretch for a moment."*
 - *"Time to hydrate. Drink some water."*
@@ -138,6 +138,17 @@ Windows → PowerShell beep
 ---
 
 ## 🛠️ Customization
+
+### Changing the Wellness Milestone Frequency
+By default, the wellness audio plays every 5 tasks. You can change this frequency by adding an `agentwell` object to the `package.json` in the root of your project:
+
+```json
+{
+  "agentwell": {
+    "wellnessMilestone": 8
+  }
+}
+```
 
 Edit `bin/run.js` (after cloning) to:
 - Add your own messages to the `CONGRATS` or `WELLNESS` arrays

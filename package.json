@@ -27,6 +27,9 @@
   "bin": {
     "agentwell": "bin/cli.js"
   },
+  "agentwell": {
+    "wellnessMilestone": 8
+  },
   "scripts": {
     "test": "node bin/run.js --test"
   },
