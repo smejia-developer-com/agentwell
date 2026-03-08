@@ -17,7 +17,7 @@ Every time a Claude Code agent finishes a task, **agentwell** fires automaticall
 
 | | Feature | Description |
 |---|---|---|
-| 🎵 | **Celebration sound** | Short festive melody synthesized locally — no audio library needed |
+| 🎵 | **Celebration sound** | Uses macOS `say` for a spoken "Mission completed", with a synthesized melody fallback on Linux/Windows |
 | 🎉 | **Motivational message** | Rotates through 15 unique congratulatory phrases |
 | 💡 | **Wellness tip** | Rotates through 17 tips: breathing, movement, hydration, burnout prevention |
 | 🤖 | **Smart detection** | Different label for main agent `Stop` vs. `SubagentStop` |
@@ -26,19 +26,20 @@ Every time a Claude Code agent finishes a task, **agentwell** fires automaticall
 
 ---
 
+
 ## 🖥️ Terminal preview
 
 ```
 ╔══════════════════════════════════════════════════════════════╗
-║  🎉  W O O H O O !   Tarea completada ✅  14:32:07
+║  🎉  W O O H O O !   Task completed ✅  14:32:07
 ╠══════════════════════════════════════════════════════════════╣
 ║
-║  🔥 ¡Fuego puro! Cada línea de código que escribes es historia.
+║  🔥 Pure fire! Every line of code you write is history.
 ║
 ╠══════════════════════════════════════════════════════════════╣
-║  💡 TIP DE BIENESTAR:
+║  💡 WELLNESS TIP:
 ║
-║  🚶 Tu cuerpo necesita moverse. 5 min de caminar = +20% de claridad mental.
+║  🚶 Your body needs movement. A 5 min walk = +20% mental clarity.
 ║
 ╚══════════════════════════════════════════════════════════════╝
 ```
@@ -94,11 +95,11 @@ The hook is registered in `~/.claude/settings.json` automatically by `agentwell 
 
 ## 🎵 Audio synthesis
 
-agentwell generates a short WAV melody in memory using Python's built-in `wave` and `struct` modules — **zero external audio libraries needed**. The sound plays in the background and never blocks the terminal.
+agentwell uses native voice synthesis on macOS (`say` command) to announce "Mission completed. Well done!". On Linux and Windows, it falls back to generating a short WAV melody in memory using Python's built-in `wave` and `struct` modules — **zero external audio libraries needed**. The sound plays in the background and never blocks the terminal.
 
 Platform fallback chain:
 ```
-macOS   → afplay  (built-in)
+macOS   → say (built-in text-to-speech)
 Linux   → paplay  (PulseAudio) → aplay (ALSA)
 Windows → PowerShell beep
 ```
@@ -109,9 +110,9 @@ Windows → PowerShell beep
 
 ### 🎉 Motivational messages (15, random)
 ```
-⚡ ¡Boom! Otra tarea destruida. Eres imparable.
-💎 Calidad de diamante. Así se construyen cosas que duran.
-🧠 Mente de arquitecto. Ver cómo resuelves problemas es inspirador.
+⚡ Boom! Another task crushed. You are unstoppable.
+💎 Diamond quality. This is how lasting things are built.
+🧠 Architect mind. Seeing how you solve problems is inspiring.
 ...
 ```
 
@@ -179,11 +180,11 @@ MIT — free to use, modify, and share.
 
 PRs welcome! Ideas:
 
-- [ ] English message bank option via `agentwell install --lang en`
+- [x] English messages (Current default)
 - [ ] Configurable tip categories (opt-out of certain wellness types)
 - [ ] `--silent` flag to disable sound in CI/remote environments
 - [ ] Session streak counter
-- [ ] macOS `say` TTS integration for spoken celebrations
+- [x] macOS `say` TTS integration for spoken celebrations
 
 ---
 
