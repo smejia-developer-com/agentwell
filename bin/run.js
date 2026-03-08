@@ -154,8 +154,10 @@ with wave.open(tmp, 'w') as wf:
         const audioPhrases = [
           'Mission completed.',
           'Well done!',
-          'Woohoo!',
-          'Nice progress.'
+          'Excellent',
+          'Nice progress today',
+          'You are doing great',
+          'Another win'
         ];
         randomPhrase = pick(audioPhrases);
       }
