@@ -17,7 +17,8 @@ Every time a Claude Code agent finishes a task, **agentwell** fires automaticall
 
 | | Feature | Description |
 |---|---|---|
-| 🎵 | **Celebration sound** | Uses macOS `say` for a spoken "Mission completed", with a synthesized melody fallback on Linux/Windows |
+| 🎵 | **Celebration sound** | Uses macOS `say` for spoken messages ("We did it", "Mission completed"). Fallback: synthesized melody |
+| 🎈 | **Milestone reminders** | Every 5th task triggers a specific wellness message (e.g. "Take a deep breath", "Stretch for a moment") |
 | 🎉 | **Motivational message** | Rotates through 15 unique congratulatory phrases |
 | 💡 | **Wellness tip** | Rotates through 17 tips: breathing, movement, hydration, burnout prevention |
 | 🤖 | **Smart detection** | Different label for main agent `Stop` vs. `SubagentStop` |
@@ -95,7 +96,15 @@ The hook is registered in `~/.claude/settings.json` automatically by `agentwell 
 
 ## 🎵 Audio synthesis
 
-agentwell uses native voice synthesis on macOS (`say` command) to announce "Mission completed. Well done!". On Linux and Windows, it falls back to generating a short WAV melody in memory using Python's built-in `wave` and `struct` modules — **zero external audio libraries needed**. The sound plays in the background and never blocks the terminal.
+agentwell uses native voice synthesis on macOS (`say` command) to randomly announce one of several victory phrases (e.g., "Mission completed", "Well done!"). 
+
+**🧘‍♂️ Wellness Milestones**
+To keep you mindful during deep work, **every 5 tasks** the standard victory phrase is replaced with a spoken wellness reminder, such as:
+- *"Great job. Take a deep breath."*
+- *"Stretch for a moment."*
+- *"Time to hydrate. Drink some water."*
+
+On Linux and Windows, it falls back to generating a short WAV melody in memory using Python's built-in `wave` and `struct` modules — **zero external audio libraries needed**. The sound plays in the background and never blocks the terminal.
 
 Platform fallback chain:
 ```
