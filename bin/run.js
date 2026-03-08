@@ -9,6 +9,7 @@
 const { execSync, spawn } = require('child_process');
 const os = require('os');
 const fs = require('fs');
+const path = require('path');
 
 // ── ANSI colors ──────────────────────────────────────────────
 const R = '\x1b[0m';
@@ -88,6 +89,16 @@ function readStdin() {
 // ── Play celebration sound ────────────────────────────────────
 function playSound() {
   const platform = os.platform();
+  const lockFile = path.join(os.tmpdir(), 'agentwell.lock');
+
+  // Prevent double-play if triggered multiple times concurrently
+  try {
+    if (fs.existsSync(lockFile)) {
+      const stats = fs.statSync(lockFile);
+      if (Date.now() - stats.mtimeMs < 2000) return; // Locked for 2 seconds
+    }
+    fs.writeFileSync(lockFile, '', 'utf8');
+  } catch (_) { }
 
   function hasPython() {
     try { execSync('python3 --version', { stdio: 'ignore' }); return true; } catch { return false; }
