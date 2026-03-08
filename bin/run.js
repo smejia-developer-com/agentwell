@@ -116,8 +116,15 @@ with wave.open(tmp, 'w') as wf:
 
   try {
     if (platform === 'darwin') {
-      // Use macOS `say` for a spoken "Woohoo!" celebration
-      spawn('say', ['-v', 'Samantha', '-r', '160', 'Mission completed. Well done!'], { detached: true, stdio: 'ignore' }).unref();
+      const audioPhrases = [
+        'Mission completed.',
+        'Well done!',
+        'Woohoo!',
+        'Great, take a deep breath.'
+      ];
+      const randomPhrase = pick(audioPhrases);
+      // Use macOS `say` for a spoken celebration
+      spawn('say', ['-v', 'Samantha', '-r', '160', randomPhrase], { detached: true, stdio: 'ignore' }).unref();
 
     } else if (platform === 'linux' && hasPython()) {
       const player = hasCmd('paplay') ? 'paplay' : hasCmd('aplay') ? 'aplay -q' : null;
