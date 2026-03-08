@@ -169,7 +169,8 @@ with wave.open(tmp, 'w') as wf:
 
       // Use macOS \`say\` for a spoken celebration, rate slightly slower for relax mode
       const rate = isRelax ? '140' : '160';
-      spawn('say', ['-v', 'Daniel', '-r', rate, randomPhrase], { detached: true, stdio: 'ignore' }).unref();
+      const voice = isRelax ? 'Samantha' : 'Daniel';
+      spawn('say', ['-v', voice, '-r', rate, randomPhrase], { detached: true, stdio: 'ignore' }).unref();
 
     } else if (platform === 'linux' && hasPython()) {
       const player = hasCmd('paplay') ? 'paplay' : hasCmd('aplay') ? 'aplay -q' : null;
