@@ -6,22 +6,22 @@
 
 'use strict';
 
-const fs   = require('fs');
+const fs = require('fs');
 const path = require('path');
-const os   = require('os');
+const os = require('os');
 
-const RUN_SCRIPT   = path.resolve(__dirname, 'run.js');
-const HOOK_CMD     = `node "${RUN_SCRIPT}"`;
-const MANAGED_TAG  = '--managed-by agentwell';
+const RUN_SCRIPT = path.resolve(__dirname, 'run.js');
+const HOOK_CMD = `node "${RUN_SCRIPT}"`;
+const MANAGED_TAG = '--managed-by agentwell';
 const SETTINGS_PATH = path.join(os.homedir(), '.claude', 'settings.json');
 
 // ── Colors ───────────────────────────────────────────────────
-const R    = s => `\x1b[31m${s}\x1b[0m`;
-const G    = s => `\x1b[32m${s}\x1b[0m`;
-const Y    = s => `\x1b[33m${s}\x1b[0m`;
-const B    = s => `\x1b[1m${s}\x1b[0m`;
-const D    = s => `\x1b[2m${s}\x1b[0m`;
-const C    = s => `\x1b[36m${s}\x1b[0m`;
+const R = s => `\x1b[31m${s}\x1b[0m`;
+const G = s => `\x1b[32m${s}\x1b[0m`;
+const Y = s => `\x1b[33m${s}\x1b[0m`;
+const B = s => `\x1b[1m${s}\x1b[0m`;
+const D = s => `\x1b[2m${s}\x1b[0m`;
+const C = s => `\x1b[36m${s}\x1b[0m`;
 
 // ── Help ─────────────────────────────────────────────────────
 function printHelp() {
@@ -33,6 +33,7 @@ ${B('Usage:')}
   agentwell uninstall   Remove agentwell hooks from settings
   agentwell status      Show current installation status
   agentwell run         Fire the celebration panel manually (test)
+  agentwell relax       Play a guided breathing & relaxation audio
   agentwell help        Show this help message
 
 ${B('What it does:')}
@@ -156,10 +157,10 @@ function status() {
 
   for (const event of ['Stop', 'SubagentStop']) {
     const groups = (settings.hooks || {})[event] || [];
-    const found  = groups.some(g =>
+    const found = groups.some(g =>
       Array.isArray(g.hooks) && g.hooks.some(isAgentWellEntry)
     );
-    const label  = found ? G('✓ installed') : R('✗ not found');
+    const label = found ? G('✓ installed') : R('✗ not found');
     console.log(`  ${event.padEnd(16)} ${label}`);
   }
 
@@ -175,10 +176,11 @@ function run() {
 const cmd = process.argv[2];
 
 switch (cmd) {
-  case 'install':   install();   break;
+  case 'install': install(); break;
   case 'uninstall': uninstall(); break;
-  case 'status':    status();    break;
-  case 'run':       run();       break;
+  case 'status': status(); break;
+  case 'run': run(); break;
+  case 'relax': run(); break;
   case 'help':
   case '--help':
   case '-h':

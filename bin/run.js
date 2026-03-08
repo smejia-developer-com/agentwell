@@ -66,8 +66,8 @@ function pick(arr) {
 
 // ── Read Claude Code event from stdin ────────────────────────
 function readStdin() {
-  // In test mode or interactive terminal, skip stdin entirely
-  if (process.argv.includes('--test') || process.stdin.isTTY) return {};
+  // In test mode, relax mode, or interactive terminal, skip stdin entirely
+  if (process.argv.includes('--test') || process.argv.includes('relax') || process.stdin.isTTY) return {};
   try {
     // Open stdin with O_NONBLOCK so we never block if nothing is piped
     const fd = fs.openSync('/dev/stdin', fs.constants.O_RDONLY | fs.constants.O_NONBLOCK);
@@ -87,7 +87,7 @@ function readStdin() {
 }
 
 // ── Play celebration sound ────────────────────────────────────
-function playSound() {
+function playSound(isRelax) {
   const platform = os.platform();
   const lockFile = path.join(os.tmpdir(), 'agentwell.lock');
 
@@ -127,43 +127,49 @@ with wave.open(tmp, 'w') as wf:
 
   try {
     if (platform === 'darwin') {
-      // Track task count
-      const countFile = path.join(os.homedir(), '.claude', 'agentwell.count');
-      let tasksCompleted = 1;
-      try {
-        if (fs.existsSync(countFile)) {
-          tasksCompleted = parseInt(fs.readFileSync(countFile, 'utf8'), 10) + 1;
-        }
-        // Save new count (or create directory if missing)
-        fs.mkdirSync(path.dirname(countFile), { recursive: true });
-        fs.writeFileSync(countFile, tasksCompleted.toString(), 'utf8');
-      } catch (_) { }
-
       let randomPhrase = '';
-      if (tasksCompleted % 5 === 0) {
-        // Every 5th task, say a wellness phrase
-        const wellnessPhrases = [
-          'Great job. Take a deep breath.',
-          'Stretch for a moment.',
-          'Time to hydrate. Drink some water.',
-          'Look away from the screen for 20 seconds.'
-        ];
-        randomPhrase = pick(wellnessPhrases);
+
+      if (isRelax) {
+        randomPhrase = "For now, everything is alright. The work of this moment is done. Close your eyes for a moment, inhale deeply and feel the air come in. Exhale slowly, and let the silence remind you that you are also here to breathe.";
       } else {
-        // Regular phrases for other tasks
-        const audioPhrases = [
-          'Mission completed.',
-          'Well done!',
-          'Excellent',
-          'Nice progress today',
-          'You are doing great',
-          'Another win'
-        ];
-        randomPhrase = pick(audioPhrases);
+        // Track task count
+        const countFile = path.join(os.homedir(), '.claude', 'agentwell.count');
+        let tasksCompleted = 1;
+        try {
+          if (fs.existsSync(countFile)) {
+            tasksCompleted = parseInt(fs.readFileSync(countFile, 'utf8'), 10) + 1;
+          }
+          // Save new count (or create directory if missing)
+          fs.mkdirSync(path.dirname(countFile), { recursive: true });
+          fs.writeFileSync(countFile, tasksCompleted.toString(), 'utf8');
+        } catch (_) { }
+
+        if (tasksCompleted % 5 === 0) {
+          // Every 5th task, say a wellness phrase
+          const wellnessPhrases = [
+            'Great job. Take a deep breath.',
+            'Stretch for a moment.',
+            'Time to hydrate. Drink some water.',
+            'Look away from the screen for 20 seconds.'
+          ];
+          randomPhrase = pick(wellnessPhrases);
+        } else {
+          // Regular phrases for other tasks
+          const audioPhrases = [
+            'Mission completed.',
+            'Well done!',
+            'Excellent',
+            'Nice progress today',
+            'You are doing great',
+            'Another win'
+          ];
+          randomPhrase = pick(audioPhrases);
+        }
       }
 
-      // Use macOS `say` for a spoken celebration
-      spawn('say', ['-v', 'Daniel', '-r', '160', randomPhrase], { detached: true, stdio: 'ignore' }).unref();
+      // Use macOS \`say\` for a spoken celebration, rate slightly slower for relax mode
+      const rate = isRelax ? '140' : '160';
+      spawn('say', ['-v', 'Daniel', '-r', rate, randomPhrase], { detached: true, stdio: 'ignore' }).unref();
 
     } else if (platform === 'linux' && hasPython()) {
       const player = hasCmd('paplay') ? 'paplay' : hasCmd('aplay') ? 'aplay -q' : null;
@@ -184,7 +190,7 @@ with wave.open(tmp, 'w') as wf:
 }
 
 // ── Print the celebration panel ──────────────────────────────
-function printPanel(hookEvent) {
+function printPanel(hookEvent, isRelax) {
   const isSubagent = hookEvent === 'SubagentStop';
   const taskLabel = isSubagent ? 'Subagent completed 🤖' : 'Task completed ✅';
   const ts = new Date().toLocaleTimeString('en-GB');
@@ -193,25 +199,39 @@ function printPanel(hookEvent) {
   const bar = '═'.repeat(62);
 
   process.stdout.write('\n');
-  process.stdout.write(`${YELLOW}${BOLD}╔${bar}╗${R}\n`);
-  process.stdout.write(`${YELLOW}${BOLD}║${R}  ${WHITE}${BOLD}🎉  W O O H O O !   ${taskLabel}${R}  ${DIM}${ts}${R}\n`);
-  process.stdout.write(`${YELLOW}${BOLD}╠${bar}╣${R}\n`);
-  process.stdout.write(`${YELLOW}${BOLD}║${R}\n`);
-  process.stdout.write(`${YELLOW}${BOLD}║${R}  ${GREEN}${BOLD}${congrats}${R}\n`);
-  process.stdout.write(`${YELLOW}${BOLD}║${R}\n`);
-  process.stdout.write(`${YELLOW}${BOLD}╠${bar}╣${R}\n`);
-  process.stdout.write(`${YELLOW}${BOLD}║${R}  ${CYAN}${BOLD}💡 WELLNESS TIP:${R}\n`);
-  process.stdout.write(`${YELLOW}${BOLD}║${R}\n`);
-  process.stdout.write(`${YELLOW}${BOLD}║${R}  ${MAGENTA}${wellness}${R}\n`);
-  process.stdout.write(`${YELLOW}${BOLD}║${R}\n`);
-  process.stdout.write(`${YELLOW}${BOLD}╚${bar}╝${R}\n`);
+  if (isRelax) {
+    process.stdout.write(`${CYAN}${BOLD}╔${bar}╗${R}\n`);
+    process.stdout.write(`${CYAN}${BOLD}║${R}  ${WHITE}${BOLD}🍃  R E L A X   M O D E   ${R}  ${DIM}${ts}${R}\n`);
+    process.stdout.write(`${CYAN}${BOLD}╠${bar}╣${R}\n`);
+    process.stdout.write(`${CYAN}${BOLD}║${R}  ${CYAN}For now, everything is alright.${R}\n`);
+    process.stdout.write(`${CYAN}${BOLD}║${R}  ${CYAN}The work of this moment is done.${R}\n`);
+    process.stdout.write(`${CYAN}${BOLD}║${R}  ${CYAN}Close your eyes for a moment,${R}\n`);
+    process.stdout.write(`${CYAN}${BOLD}║${R}  ${CYAN}inhale deeply and feel the air come in.${R}\n`);
+    process.stdout.write(`${CYAN}${BOLD}║${R}  ${CYAN}Exhale slowly, and let the silence${R}\n`);
+    process.stdout.write(`${CYAN}${BOLD}║${R}  ${CYAN}remind you that you are also here to breathe.${R}\n`);
+    process.stdout.write(`${CYAN}${BOLD}╚${bar}╝${R}\n`);
+  } else {
+    process.stdout.write(`${YELLOW}${BOLD}╔${bar}╗${R}\n`);
+    process.stdout.write(`${YELLOW}${BOLD}║${R}  ${WHITE}${BOLD}🎉  W O O H O O !   ${taskLabel}${R}  ${DIM}${ts}${R}\n`);
+    process.stdout.write(`${YELLOW}${BOLD}╠${bar}╣${R}\n`);
+    process.stdout.write(`${YELLOW}${BOLD}║${R}\n`);
+    process.stdout.write(`${YELLOW}${BOLD}║${R}  ${GREEN}${BOLD}${congrats}${R}\n`);
+    process.stdout.write(`${YELLOW}${BOLD}║${R}\n`);
+    process.stdout.write(`${YELLOW}${BOLD}╠${bar}╣${R}\n`);
+    process.stdout.write(`${YELLOW}${BOLD}║${R}  ${CYAN}${BOLD}💡 WELLNESS TIP:${R}\n`);
+    process.stdout.write(`${YELLOW}${BOLD}║${R}\n`);
+    process.stdout.write(`${YELLOW}${BOLD}║${R}  ${MAGENTA}${wellness}${R}\n`);
+    process.stdout.write(`${YELLOW}${BOLD}║${R}\n`);
+    process.stdout.write(`${YELLOW}${BOLD}╚${bar}╝${R}\n`);
+  }
   process.stdout.write('\n');
 }
 
 // ── Main ─────────────────────────────────────────────────────
 const isTest = process.argv.includes('--test');
-const hookEvent = isTest ? 'Stop' : (readStdin().hook_event_name || 'Stop');
+const isRelax = process.argv.includes('relax');
+const hookEvent = isTest || isRelax ? 'Stop' : (readStdin().hook_event_name || 'Stop');
 
-playSound();
-printPanel(hookEvent);
+playSound(isRelax);
+printPanel(hookEvent, isRelax);
 process.exit(0);
